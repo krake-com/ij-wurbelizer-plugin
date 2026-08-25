@@ -12,6 +12,16 @@ A wurblet mixes two code levels in one file:
 | `@{ … }@` | — | a wurbiler directive |
 | everything else | output level | the code being generated |
 
+## Installing
+
+*Settings | Plugins | Marketplace*, search for **Wurbelizer**.
+
+Alternatively, download the plugin zip and use *Settings | Plugins | ⚙ | Install Plugin
+from Disk*.
+
+Requires a Java-capable IDE (IntelliJ IDEA Community or Ultimate, Android Studio) —
+the plugin depends on the bundled Java plugin. IDEA 2025.1 or newer.
+
 ## How it works
 
 The wurbiler's translation is a pure, order-preserving concatenation, so the whole `.wrbl`
@@ -63,14 +73,22 @@ The internals — lexer, PSI, the two injected documents, the colors — are doc
 
 ## Building and running
 
-Requires the locally installed IntelliJ IDEA (configured in `gradle.properties` as
-`platformLocalPath`) and a JDK 25 toolchain.
+Requires a JDK 25 toolchain. The IntelliJ Platform to build against is downloaded
+automatically (`platformType`/`platformVersion` in `gradle.properties`, currently IDEA
+Community 2025.1 — the oldest supported IDE).
 
 ```bash
 ./gradlew test          # unit tests, including the golden tests against Tentackle
 ./gradlew buildPlugin   # build/distributions/ij-wurbelizer-plugin-*.zip
 ./gradlew runIde        # a sandbox IDE with the plugin installed
+./gradlew verifyPlugin  # binary compatibility across the supported IDE range
 ```
+
+To compile against a locally installed IDE instead and skip the download, set
+`platformLocalPath` in `~/.gradle/gradle.properties` or `IDEA_HOME` in the environment.
+This is a development convenience only — pass `-PplatformLocalPath=` to override it, and
+never cut a release build that way, since the artifact would be tied to whichever IDE
+happens to be installed.
 
 The tests use the wurblet sources of the [Tentackle](https://tentackle.org) framework as
 fixtures, together with the `.java` files its build generated from them, so the
@@ -106,3 +124,7 @@ of ours.
 - `@{code}@` and `@{comment}@` bodies are not injected as Java and javadoc.
 - A backslash directly followed by a blank cannot be expressed in generated output: the
   wurbiler drops both characters and there is no escape for it.
+
+## License
+
+LGPL 2.1 or later — see [LICENSE](LICENSE).

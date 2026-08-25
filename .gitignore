@@ -8,6 +8,11 @@ target/
 keystore
 .mvn/
 
+# Plugin signing material - keys and certificates belong outside the repository
+*.pem
+*.crt
+*.p12
+
 # Eclipse
 *.pydevproject
 .project

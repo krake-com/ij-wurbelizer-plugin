@@ -1,0 +1,20 @@
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Wurbelizer plugin logo.
+    The diagonal split stands for the two code levels a wurblet holds at once:
+    the wurblet level and the output level. The W is drawn as a path rather than
+    text so it renders identically wherever the icon is shown.
+  -->
+  <defs>
+    <clipPath id="wurbletIconClip">
+      <rect width="40" height="40" rx="8"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#wurbletIconClip)">
+    <rect width="40" height="40" fill="#548AF7"/>
+    <path d="M0 40 L40 0 L40 40 Z" fill="#3A6FD8"/>
+  </g>
+  <path d="M10 12 L14.5 28 L20 18 L25.5 28 L30 12"
+        fill="none" stroke="#F5F7FF" stroke-width="3.4"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

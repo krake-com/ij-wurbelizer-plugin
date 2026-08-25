@@ -1,3 +1,4 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
@@ -9,77 +10,24 @@ group = providers.gradleProperty("pluginGroup").get()
 version = providers.gradleProperty("pluginVersion").get()
 
 /**
- * Home of the locally installed IntelliJ IDEA the plugin is compiled against.
+ * Validates an explicitly configured IntelliJ IDEA home.
  *
- * The path is machine-specific, so it must never be hardcoded in a tracked file.
- * Resolution order:
- *   1. the `platformLocalPath` Gradle property (`-P`, or `~/.gradle/gradle.properties`)
- *   2. the `IDEA_HOME` environment variable
- *   3. the JetBrains Toolbox launcher script, if present
- *   4. the usual installation directories of the current OS
+ * Development builds may compile against a locally installed IDE instead of the
+ * downloaded platform artifact, which saves the ~1 GB download. This is opt-in only:
+ * set the `platformLocalPath` Gradle property or the `IDEA_HOME` environment variable.
+ * Release builds must never use it, because the resulting artifact would be tied to
+ * whatever IDE happens to be installed on the machine that produced it.
  *
  * A directory counts as an IDE home only if it contains a `build.txt`
  * (directly on Linux/Windows, under `Resources/` on macOS).
  */
-fun ideaHome(): String {
+fun explicitIdeaHome(source: String, value: String): String {
   fun File.isIdeHome() = resolve("build.txt").isFile || resolve("Resources/build.txt").isFile
 
-  fun explicit(source: String, value: String): String {
-    val dir = File(value)
-    require(dir.isDirectory) { "$source points to '$value', which does not exist or is not a directory." }
-    require(dir.isIdeHome()) { "$source points to '$value', which is not an IntelliJ IDEA installation (no build.txt)." }
-    return dir.absolutePath
-  }
-
-  providers.gradleProperty("platformLocalPath").orNull
-    ?.takeIf { it.isNotBlank() }
-    ?.let { return explicit("Gradle property 'platformLocalPath'", it) }
-
-  providers.environmentVariable("IDEA_HOME").orNull
-    ?.takeIf { it.isNotBlank() }
-    ?.let { return explicit("Environment variable IDEA_HOME", it) }
-
-  val home = File(System.getProperty("user.home"))
-
-  // JetBrains Toolbox generates a launcher script that quotes the real installation path.
-  val toolboxLauncher = home.resolve(".local/share/JetBrains/Toolbox/scripts/idea")
-  if (toolboxLauncher.isFile) {
-    Regex("\"([^\"]+)/bin/idea\"").find(toolboxLauncher.readText())
-      ?.groupValues?.get(1)
-      ?.let { File(it) }
-      ?.takeIf { it.isIdeHome() }
-      ?.let { return it.absolutePath }
-  }
-
-  val os = System.getProperty("os.name").lowercase()
-  val candidates = when {
-    os.contains("mac") -> listOf(
-      File("/Applications/IntelliJ IDEA.app/Contents"),
-      home.resolve("Applications/IntelliJ IDEA.app/Contents"),
-    )
-    os.contains("win") -> listOf(
-      File("C:/Program Files/JetBrains").listFiles().orEmpty().toList(),
-      home.resolve("AppData/Local/JetBrains/Toolbox/apps").listFiles().orEmpty().toList(),
-    ).flatten()
-    else -> listOf(
-      File("/opt").listFiles().orEmpty().toList(),
-      File("/usr/local").listFiles().orEmpty().toList(),
-      File("/snap/intellij-idea-ultimate/current").let(::listOf),
-      home.resolve(".local/share/JetBrains/Toolbox/apps").listFiles().orEmpty().toList(),
-    ).flatten().filter { it.name.lowercase().let { n -> n.contains("idea") || n.contains("intellij") } }
-  }
-
-  return candidates.firstOrNull { it.isDirectory && it.isIdeHome() }?.absolutePath
-    ?: error(
-      """
-      No local IntelliJ IDEA installation found.
-      Point the build at your IDE by either
-        * setting IDEA_HOME in the environment, or
-        * adding `platformLocalPath=<path to your IDE>` to ~/.gradle/gradle.properties, or
-        * passing -PplatformLocalPath=<path to your IDE> on the command line.
-      Use the directory containing build.txt (on macOS: `IntelliJ IDEA.app/Contents`).
-      """.trimIndent()
-    )
+  val dir = File(value)
+  require(dir.isDirectory) { "$source points to '$value', which does not exist or is not a directory." }
+  require(dir.isIdeHome()) { "$source points to '$value', which is not an IntelliJ IDEA installation (no build.txt)." }
+  return dir.absolutePath
 }
 
 repositories {
@@ -91,7 +39,24 @@ repositories {
 
 dependencies {
   intellijPlatform {
-    local(ideaHome())
+    // Blank explicitly disables the local IDE, so a release build can override a
+    // platformLocalPath set in ~/.gradle/gradle.properties with -PplatformLocalPath=
+    val localPathProperty = providers.gradleProperty("platformLocalPath").orNull?.takeIf { it.isNotBlank() }
+    val localPathEnv = providers.environmentVariable("IDEA_HOME").orNull?.takeIf { it.isNotBlank() }
+
+    when {
+      localPathProperty != null ->
+        local(explicitIdeaHome("Gradle property 'platformLocalPath'", localPathProperty))
+
+      localPathEnv != null ->
+        local(explicitIdeaHome("Environment variable IDEA_HOME", localPathEnv))
+
+      else -> create(
+        providers.gradleProperty("platformType"),
+        providers.gradleProperty("platformVersion"),
+      )
+    }
+
     bundledPlugin("com.intellij.java")
 
     testFramework(TestFrameworkType.Platform)
@@ -106,6 +71,34 @@ intellijPlatform {
     ideaVersion {
       sinceBuild = providers.gradleProperty("pluginSinceBuild")
       untilBuild = provider { null }
+    }
+  }
+
+  signing {
+    certificateChainFile = providers.gradleProperty("signCertificateChainFile").map { file(it) }
+    privateKeyFile = providers.gradleProperty("signPrivateKeyFile").map { file(it) }
+    password = providers.gradleProperty("signPrivateKeyPassword")
+  }
+
+  publishing {
+    token = providers.gradleProperty("intellijPlatformPublishingToken")
+  }
+
+  pluginVerification {
+    ides {
+      // IDEA Community and Ultimate were separate products up to 2025.2 and merged
+      // into a single distribution in 2025.3, so the supported range needs both types
+      // to be covered end to end. untilBuild is open in plugin.xml, so the upper half
+      // is left unbounded and picks up every release from 2025.3 onwards.
+      select {
+        types = listOf(IntelliJPlatformType.IntellijIdeaCommunity)
+        sinceBuild = providers.gradleProperty("pluginSinceBuild")
+        untilBuild = "252.*"
+      }
+      select {
+        types = listOf(IntelliJPlatformType.IntellijIdea)
+        sinceBuild = "253"
+      }
     }
   }
 }

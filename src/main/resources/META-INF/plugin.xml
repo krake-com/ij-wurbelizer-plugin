@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>org.wurbelizer.idea.wurblet</id>
   <name>Wurbelizer</name>
-  <vendor email="harald@krake.de">Harald Krake</vendor>
+  <vendor email="harald@krake.de" url="https://wurbelizer.org">Harald Krake</vendor>
 
   <description><![CDATA[
     Editor support for <a href="https://wurbelizer.org">Wurbelizer</a> wurblet sources
@@ -24,6 +24,22 @@
           class and <code>@{import}@</code> targets</li>
     </ul>
   ]]></description>
+
+  <change-notes><![CDATA[
+    <h4>1.0.0</h4>
+    <p>First public release.</p>
+    <ul>
+      <li>Syntax highlighting, per-level background tint and brace matching for
+          <code>@[ ]@</code>, <code>@( )@</code> and <code>@{ }@</code></li>
+      <li>Java code insight on both the wurblet level and the output level, via
+          language injection</li>
+      <li>Completion and validation of the wurbiler directives</li>
+      <li>Navigation to <code>@{include}@</code> files, the <code>@{extends}@</code>
+          parent class and <code>@{import}@</code> targets</li>
+      <li>Quick fix for unescaped <code>@</code> sequences</li>
+      <li>Per-project settings under <em>Settings | Languages &amp; Frameworks | Wurblet</em></li>
+    </ul>
+  ]]></change-notes>
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.java</depends>
