@@ -1,0 +1,28 @@
+@{include $currentDir/header.incl}@
+@{comment
+<strong>({\@code \@wurblet})</strong> Generate code to define the column lengths.
+<p>
+usage:<br>
+&#064;wurblet &lt;tag&gt; ColumnLengths [--noif]
+<p>
+arguments:
+<ul>
+<li><em>--noif:</em> if not part of an interface (adds "public static final")</li>
+</ul>
+For more options, see {\@link ModelWurblet}.
+}@
+@[
+  private void wurbel() throws ModelException {
+    String lead = getOption("noif") == null ? "" : "public static final ";
+    for (Attribute attr: getEntity().getAttributes())  {
+      if ("String".equals(attr.getEffectiveDataType().getJavaType()) &&
+          attr.getSize() != null && attr.getSize() != 0 && !attr.getOptions().isNoConstant() && !attr.getOptions().isFromSuper())  {
+]@
+
+  /** maximum number of characters for '@(attr)@'. */
+  @(lead)@int CL_@(attr.getName().toUpperCase(Locale.ROOT))@ = @(attr.getSize())@;
+@[
+      }
+    }
+  }
+]@

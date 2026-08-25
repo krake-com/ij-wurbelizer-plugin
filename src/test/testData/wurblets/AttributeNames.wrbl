@@ -1,0 +1,37 @@
+@{include $currentDir/header.incl}@
+@{comment
+<strong>({\@code \@wurblet})</strong> Generate code to define the attribute- and relation-names of an entity.
+<p>
+usage:<br>
+&#064;wurblet &lt;tag&gt; AttributeNames [--noif]
+<p>
+arguments:
+<ul>
+<li><em>--noif:</em> if not part of an interface (adds "public static final")</li>
+</ul>
+For more options, see {\@link ModelWurblet}.
+}@
+@[
+  private void wurbel() {
+    String lead = getOption("noif") == null ? "" : "public static final ";
+    for (Relation rel: getEntity().getRelations()) {
+      String var = rel.getVariableName();
+]@
+
+  /** relation name for '@(rel)@'. */
+  @(lead)@String RN_@(var.toUpperCase(Locale.ROOT))@ = "@(var)@";
+@[
+    }
+
+    for (Attribute attr: getEntity().getAttributes())  {
+      if (!attr.getOptions().isNoConstant() && !attr.getOptions().isFromSuper() && !attr.getOptions().isMute())    {
+          String name = attr.getName().toUpperCase(Locale.ROOT);
+]@
+
+  /** attribute name for database column '@(attr.getColumnName())@'. */
+  @(lead)@String AN_@(name)@ = "@(attr.getName())@";
+@[
+      }
+    }
+  }
+]@

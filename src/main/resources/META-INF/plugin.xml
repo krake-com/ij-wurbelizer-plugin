@@ -1,0 +1,78 @@
+<idea-plugin>
+  <id>org.wurbelizer.idea.wurblet</id>
+  <name>Wurbelizer</name>
+  <vendor email="harald@krake.de">Harald Krake</vendor>
+
+  <description><![CDATA[
+    Editor support for <a href="https://wurbelizer.org">Wurbelizer</a> wurblet sources
+    (<code>*.wrbl</code>).
+    <p>
+    A wurblet mixes two code levels in one file: the <em>wurblet level</em>
+    (<code>@[ ... ]@</code>, the generator's own Java) and the <em>output level</em>
+    (everything else, the code being generated), with <code>@( expr )@</code> splicing a
+    wurblet level value into the output and <code>@{ ... }@</code> carrying wurbiler
+    directives.
+    <p>
+    The plugin reconstructs both levels as Java and injects them, so code completion,
+    resolution, parameter info and navigation work on the generator code
+    <em>and</em> on the code being generated.
+    <ul>
+      <li>Syntax highlighting and brace matching for the level markers, directives and escapes</li>
+      <li>Code completion on both code levels</li>
+      <li>Completion and validation of the wurbiler directives</li>
+      <li>Navigation to <code>@{include}@</code> files, the <code>@{extends}@</code> parent
+          class and <code>@{import}@</code> targets</li>
+    </ul>
+  ]]></description>
+
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.java</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <fileType name="Wurblet"
+              implementationClass="org.wurbelizer.idea.lang.WurbletFileType"
+              fieldName="INSTANCE"
+              language="Wurblet"
+              extensions="wrbl"/>
+
+    <lang.parserDefinition language="Wurblet"
+                           implementationClass="org.wurbelizer.idea.lang.WurbletParserDefinition"/>
+
+    <lang.syntaxHighlighterFactory language="Wurblet"
+                                   implementationClass="org.wurbelizer.idea.highlight.WurbletSyntaxHighlighterFactory"/>
+
+    <colorSettingsPage implementation="org.wurbelizer.idea.highlight.WurbletColorSettingsPage"/>
+
+    <additionalTextAttributes scheme="Default" file="colorSchemes/WurbletDefault.xml"/>
+    <additionalTextAttributes scheme="Darcula" file="colorSchemes/WurbletDarcula.xml"/>
+
+    <lang.braceMatcher language="Wurblet"
+                       implementationClass="org.wurbelizer.idea.lang.WurbletBraceMatcher"/>
+
+    <multiHostInjector implementation="org.wurbelizer.idea.inject.WurbletJavaInjector"/>
+
+    <lang.elementManipulator forClass="org.wurbelizer.idea.psi.WurbletHostElement"
+                             implementationClass="org.wurbelizer.idea.psi.WurbletHostManipulator"/>
+
+    <importFilter implementation="org.wurbelizer.idea.inject.WurbletImportFilter"/>
+
+    <daemon.highlightInfoFilter implementation="org.wurbelizer.idea.highlight.WurbletOutputHighlightFilter"/>
+    <highlightErrorFilter implementation="org.wurbelizer.idea.highlight.WurbletOutputErrorFilter"/>
+
+    <annotator language="Wurblet"
+               implementationClass="org.wurbelizer.idea.inspection.WurbletAnnotator"/>
+    <annotator language="Wurblet"
+               implementationClass="org.wurbelizer.idea.highlight.WurbletLevelBackgroundAnnotator"/>
+
+    <psi.referenceContributor language="Wurblet"
+                              implementation="org.wurbelizer.idea.reference.WurbletReferenceContributor"/>
+
+    <completion.contributor language="Wurblet"
+                            implementationClass="org.wurbelizer.idea.completion.WurbletCompletionContributor"/>
+
+    <projectConfigurable parentId="language"
+                         instance="org.wurbelizer.idea.settings.WurbletConfigurable"
+                         id="org.wurbelizer.idea.settings.WurbletConfigurable"
+                         displayName="Wurblet"/>
+  </extensions>
+</idea-plugin>

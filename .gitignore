@@ -1,0 +1,44 @@
+# Netbeans
+nb-configuration.xml
+nbactions*.xml
+jshell.history
+
+# Maven
+target/
+keystore
+.mvn/
+
+# Eclipse
+*.pydevproject
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+.externalToolBuilders/
+*.launch
+
+# IntelliJ
+*.iml
+.idea/
+.junie/
+*.ipr
+*.iws
+qodana.yaml
+
+/velocity.log
+.attach_pid*
+/build/
+/.intellijPlatform/
+/.gradle/
+# Keep gradle/wrapper/ tracked so `./gradlew` works on a fresh clone.
+/gradle/*
+!/gradle/wrapper/

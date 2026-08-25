@@ -1,0 +1,15 @@
+<!-- Backgrounds of the two code levels in the dark schemes, see WurbletDefault.xml. -->
+<scheme name="Darcula" version="142" parent_scheme="Darcula">
+  <attributes>
+    <option name="WURBLET_LEVEL_BACKGROUND">
+      <value>
+        <option name="BACKGROUND" value="2f3646"/>
+      </value>
+    </option>
+    <option name="WURBLET_OUTPUT_LEVEL_BACKGROUND">
+      <value>
+        <option name="BACKGROUND" value="3b3529"/>
+      </value>
+    </option>
+  </attributes>
+</scheme>

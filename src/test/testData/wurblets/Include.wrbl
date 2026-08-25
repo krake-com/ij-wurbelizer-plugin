@@ -1,0 +1,66 @@
+@{package org.tentackle.wurblet}@
+@{import java.util.*}@
+@{import java.io.*}@
+@{import org.wurbelizer.wurbel.*}@
+@{import org.wurbelizer.wurblet.*}@
+@{import org.wurbelizer.misc.*}@
+@{extends IncludeWurblet}@
+@{args}@
+@{comment
+<strong>({\@code \@wurblet})</strong> Includes another file.
+<p>
+usage:<br>
+&#064;wurblet &lt;tag&gt; Include [--comment] [--missingok] [--translate] [--delete] &lt;filename&gt;
+<p>
+arguments:
+<ul>
+<li><em>--comment:</em> include as comment.</li>
+<li><em>--missingok:</em> missing include file is not an error.</li>
+<li><em>--translate:</em> translate $variables.</li>
+<li><em>--delete:</em> deletes the file after inclusion.</li>
+<li><em>filename:</em> the file to include.</li>
+</ul>
+For more options, see {\@link AbstractWurblet}.
+}@
+@[
+  private void wurbel() throws WurbelException {
+    // read the file to include
+    char[] chars = new char[128];
+    StringBuilder outBuf = new StringBuilder(512);
+    // copy
+    try (BufferedReader reader = new BufferedReader(WurbelHelper.openReader(filename))) {
+      int numRead;
+      while((numRead = reader.read(chars)) > -1) {
+        outBuf.append(String.valueOf(chars, 0, numRead));
+      }
+      if (translate) {
+        WurbelHelper.translateVariables(outBuf, getContainer().getProperties(Wurbler.PROPSPACE_WURBLET));
+      }
+      if (outBuf.indexOf(Constants.ORIGIN_INFO_LEAD) == 0) {
+        // remove info line
+        int ndx = outBuf.indexOf("\n");   // EOL (crlf or lf)
+        if (ndx > 0) {
+          outBuf.delete(0, ndx + 1);
+        }
+        else {
+          outBuf.setLength(0);
+          outBuf.append("// <empty>\n");
+        }
+      }
+      out.print(outBuf);
+    }
+    catch (IOException ex) {
+      throw new WurbelException("including " + filename + " failed", ex);
+    }
+    catch (WurbelException ex)  {
+      if (missingOk && ex.getCause() instanceof FileNotFoundException) {
+]@
+        // no such file '@(filename)@' (ok)
+@[
+      }
+      else {
+        throw ex;
+      }
+    }
+  }
+]@

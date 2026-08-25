@@ -1,0 +1,123 @@
+@{include $currentDir/header.incl}@
+@{phase 2}@
+@{comment
+<strong>({\@code \@wurblet})</strong> Generate unique domain key class for an entity.
+<p>
+usage:<br>
+&#064;wurblet &lt;tag&gt; UniqueDomainKey
+<p>
+For more options, see {\@link ModelWurblet}.
+}@
+@[
+  private void wurbel() throws ModelException {
+    List<Attribute> udk = getEntity().getUniqueDomainKey();
+    List<Attribute> superUdk = null;
+    if (getEntity().getSuperEntity() != null) {
+      superUdk = getEntity().getSuperEntity().getUniqueDomainKey();
+    }
+    if (superUdk != null && !udk.isEmpty() && udk.equals(superUdk)) {
+]@
+  // @(getEntity())@ inherits from @(getEntity().getSuperEntity())@
+@[
+    }
+    else if (!getEntity().isRootEntity()) {
+]@
+  // @(getEntity())@ is not a root entity
+@[
+    }
+    else if (udk.isEmpty()) {
+]@
+  // no unique domain key defined for @(getEntity())@
+@[
+    }
+    else if (udk.size() == 1) {
+]@
+  // unique domain key for @(getEntity())@ is @(udk.get(0))@
+@[
+    }
+    else  {
+      // public is noise if within an interface and nested records are implicitly static
+      String modifiers = isInterface() ? "" : "public ";
+      StringBuilder con1Args = new StringBuilder();   // 1st constructor arguments
+      StringBuilder con2Args = new StringBuilder();   // 2nd constructor arguments
+      boolean first = true;
+      for (Attribute attr: udk) {
+        if (first) {
+          first = false;
+        }
+        else {
+          con1Args.append(", ");
+          con2Args.append(", ");
+        }
+        con1Args.append(attr.getJavaType()).append(" ").append(attr.getName());
+        con2Args.append("pdo.").append(attr.getGetterName()).append("()");
+      }
+]@
+  /**
+   * The unique domain key for @(getEntity())@.
+   *
+@[
+      for (Attribute attr: udk) {
+]@
+   * \@param @(attr.getName())@ @(attr.getOptions().getComment())@
+@[
+      }
+]@
+   */
+  @(modifiers)@record @(getEntity())@UDK(@(con1Args.toString())@)
+         implements Serializable, Comparable<@(getEntity())@UDK> {
+
+    /**
+     * Creates a unique domain key for a pdo.
+     *
+     * \@param pdo the pdo
+     */
+    public @(getEntity())@UDK(@(getEntity())@ pdo) {
+      this(@(con2Args.toString())@);
+    }
+
+    \@Override
+    public int compareTo(@(getEntity())@UDK other) {
+@[
+      String inset = "";
+      String oldInset = "";
+      for (Attribute attr: udk) {
+        String decl;
+        if (inset.isEmpty()) {
+          decl = "int ";
+        }
+        else {
+          decl = "";
+]@
+      @(oldInset)@if (rv == 0) {
+@[
+        }
+        if (attr.getDataType().isPrimitive()) {
+]@
+      @(inset)@@(decl)@rv = @(attr.getDataType().toNonPrimitive())@.compare(@(attr.getName())@, other.@(attr.getName())@);
+@[
+        }
+        else  {
+]@
+      @(inset)@@(decl)@rv = Compare.compare(@(attr.getName())@, other.@(attr.getName())@);
+@[
+        }
+        oldInset = inset;
+        inset += "  ";
+      }
+
+      while (!oldInset.isEmpty()) {
+        oldInset = oldInset.substring(2);
+]@
+      @(oldInset)@}
+@[
+
+      };
+]@
+      return rv;
+    }
+  }
+@[
+    }
+  }
+]@

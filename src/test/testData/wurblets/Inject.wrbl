@@ -1,0 +1,51 @@
+@{package org.tentackle.wurblet}@
+@{import java.util.*}@
+@{import java.io.*}@
+@{import org.wurbelizer.wurbel.*}@
+@{import org.wurbelizer.wurblet.*}@
+@{import org.tentackle.common.StringHelper}@
+@{args}@
+@{comment
+<strong>({\@code \@wurblet})</strong> Injects code from the argument list.
+<p>
+usage:<br>
+&#064;wurblet &lt;|&gt; Inject [--string] &lt;text&gt;
+<p>
+arguments:
+<ul>
+<li><em>--string:</em> enclose in double quotes.</li>
+<li><em>text:</em> the text to inject.</li>
+</ul>
+The Inject-wurblet is a tag-less wurblet and injects the code between two empty comment blocks &#047;**&#047;...&#047;**&#047;.
+If the wurblet should scan for such a pattern to the left, the pseudo tag-name {\@code <} must be used.
+If to the right, use {\@code >}.
+<p>
+Example:
+<pre>
+  String text = &#047;**&#047;"blah"&#047;**&#047;;  // &#064;wurblet &lt; Inject --string $some_variable
+</pre>
+}@
+@[
+  private void wurbel() {
+    StringBuilder text = new StringBuilder();
+    boolean asString = false;
+
+    for (String arg: getContainer().getArgs())  {
+      if (arg.startsWith("--")) {
+        if (arg.equals("--string")) {
+          asString = true;
+        }
+      }
+      else  {
+        text.append(arg);
+      }
+    }
+
+    if (asString) {
+      out.print(StringHelper.toDoubleQuotes(text.toString()));
+    }
+    else {
+      out.print(text);
+    }
+  }
+]@

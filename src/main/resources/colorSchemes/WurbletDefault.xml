@@ -1,0 +1,20 @@
+<!--
+  Backgrounds of the two code levels in the light schemes.
+
+  Cool blue against warm sand: the pair is separated on the blue-yellow axis and in luminance,
+  the axis that survives a red-green color vision deficiency.
+-->
+<scheme name="Default" version="142" parent_scheme="Default">
+  <attributes>
+    <option name="WURBLET_LEVEL_BACKGROUND">
+      <value>
+        <option name="BACKGROUND" value="e9eefa"/>
+      </value>
+    </option>
+    <option name="WURBLET_OUTPUT_LEVEL_BACKGROUND">
+      <value>
+        <option name="BACKGROUND" value="fdf6e6"/>
+      </value>
+    </option>
+  </attributes>
+</scheme>
