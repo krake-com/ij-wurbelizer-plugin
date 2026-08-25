@@ -50,7 +50,9 @@ installed on this machine.
    ```bash
    ./gradlew -PplatformLocalPath= clean build verifyPlugin
    ```
-   `verifyPlugin` must report no compatibility problems across the supported range.
+   `verifyPlugin` must report `Compatible` for every IDE in the supported range
+   (2025.1 through the current release). It downloads each IDE it checks against, so
+   the first run takes roughly twenty minutes; later runs reuse the Gradle cache.
 4. Sign:
    ```bash
    ./gradlew -PplatformLocalPath= signPlugin
