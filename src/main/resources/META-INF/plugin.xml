@@ -26,6 +26,12 @@
   ]]></description>
 
   <change-notes><![CDATA[
+    <h4>1.0.1</h4>
+    <ul>
+      <li>A backslash followed by a blank (<code>\ </code>) now stands for the blank alone,
+          matching the fixed wurbiler. It used to be dropped entirely, which could glue two
+          tokens of the injected Java together.</li>
+    </ul>
     <h4>1.0.0</h4>
     <p>First public release.</p>
     <ul>

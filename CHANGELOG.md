@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1]
+
 ### Fixed
 
 - A backslash followed by a blank (`\ `) now stands for the blank alone, matching the
@@ -32,5 +34,6 @@ First public release.
 - Per-project settings under *Settings | Languages & Frameworks | Wurblet*.
 - Colour scheme contributions for the Default and Darcula schemes.
 
-[Unreleased]: https://bitbucket.org/krake-oss/ij-wurbelizer-plugin/branches/compare/HEAD..v1.0.0
+[Unreleased]: https://bitbucket.org/krake-oss/ij-wurbelizer-plugin/branches/compare/HEAD..v1.0.1
+[1.0.1]: https://bitbucket.org/krake-oss/ij-wurbelizer-plugin/branches/compare/v1.0.1..v1.0.0
 [1.0.0]: https://bitbucket.org/krake-oss/ij-wurbelizer-plugin/src/v1.0.0/
