@@ -113,7 +113,7 @@ users' files were written against. The rules that are easy to get wrong:
 - **A further opener within a level only increments a nesting counter** and stays part of the
   enclosed text, so `@[ String s = "@(x)@"; ]@` does not end the block early.
 - **The backslash is tested before anything else, on every level.** `\@` is a literal `@`,
-  backslash-blank is dropped entirely, and a backslash before anything else keeps both
+  `\ ` a literal blank, and a backslash before anything else keeps both
   characters — so `\\` stays `\\` and there is no line continuation in a `.wrbl` file.
 - **An `@` not followed by `{`, `(` or `[` is an unknown @-sequence.** The wurbiler warns and
   keeps both characters, so the lexer emits `BAD_AT` and the annotator warns.
@@ -175,7 +175,7 @@ Two structural decisions are worth knowing about:
 - `getRangeInsideHost()` — the element's text **without** its level markers. The host carries
   `@[ … ]@`, the injected text is what lies between.
 - `createLiteralTextEscaper()` → `psi/WurbletTextEscaper`, which decodes the wurblet escapes
-  into the injected document (`\@` → `@`, backslash-blank dropped) and keeps an offset table
+  into the injected document (`\@` → `@`, `\ ` → blank) and keeps an offset table
   mapping every decoded character back to its offset in the host, so that an edit made in the
   injected document lands in the right place in the `.wrbl` file.
 - `updateText()` → `psi/WurbletHostManipulator`, which re-encodes on the way back
@@ -448,7 +448,7 @@ consequence of the design above.
 - **The output level is a best effort parse** and its diagnostics are suppressed.
 - **`@{code}@` and `@{comment}@` bodies are not injected** as Java and javadoc.
 - **A backslash directly followed by a blank cannot be expressed** in generated output: the
-  wurbiler drops both characters and there is no escape for it.
+  wurbiler turns `\ ` into a lone blank and there is no escape for it.
 
 When changing the lexer or the injector, run the golden tests first. They are the check on
 whether the reconstruction still matches the wurbiler; everything else in the plugin assumes it

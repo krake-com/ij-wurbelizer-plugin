@@ -96,7 +96,7 @@ public class WurbletLexerTest extends LexerTestCase {
         Wurblet:OUTPUT_TEXT ('b')""");
   }
 
-  /** A backslash followed by a blank is dropped by the wurbiler. */
+  /** A backslash followed by a blank stands for the blank alone. */
   public void testEscapedSpace() {
     doTest("a\\ b", """
         Wurblet:OUTPUT_TEXT ('a')

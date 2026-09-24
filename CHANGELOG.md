@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- A backslash followed by a blank (`\ `) now stands for the blank alone, matching the
+  fixed wurbiler. The plugin used to drop both characters, as older wurbilers did, which
+  could glue two tokens of the injected Java together.
+
 ## [1.0.0]
 
 First public release.

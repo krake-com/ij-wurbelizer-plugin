@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  * Decodes the wurblet escape sequences of an injection host.
  * <p>
  * The injected document sees the text the wurbiler would produce: {@code \@} becomes
- * {@code @} and a backslash followed by a blank disappears. The offset table maps every
+ * {@code @} and {@code \ } becomes a blank. The offset table maps every
  * decoded character back to its offset within the host element, so that edits made in the
  * injected document land in the right place.
  */
@@ -55,14 +55,10 @@ public class WurbletTextEscaper extends LiteralTextEscaper<WurbletHostElement> {
       char c = text.charAt(i);
       if (c == '\\' && i + 1 < end) {
         char n = text.charAt(i + 1);
-        if (n == '@') {
+        if (n == '@' || n == ' ') {
+          // the wurbiler emits the char without the backslash
           map[decoded++] = i;
-          outChars.append('@');
-          i += 2;
-          continue;
-        }
-        if (n == ' ') {
-          // both characters are dropped by the wurbiler
+          outChars.append(n);
           i += 2;
           continue;
         }

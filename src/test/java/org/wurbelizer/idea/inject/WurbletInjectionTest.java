@@ -20,6 +20,8 @@ package org.wurbelizer.idea.inject;
 
 import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiTypes;
+import com.intellij.psi.PsiVariable;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase;
 import org.wurbelizer.idea.psi.WurbletBlock;
@@ -155,6 +157,43 @@ public class WurbletInjectionTest extends LightJavaCodeInsightFixtureTestCase {
     assertTrue("placeholders wrong:\n" + injected, injected.contains("_wv0_ int CL__wv1_ = _wv2_;"));
   }
 
+  /**
+   * An escaped blank reaches the injected Java as a blank and does not glue tokens together.
+   * <p>
+   * The injected document and PSI show the raw host text, so the decoding is checked on the
+   * parsed structure: without it, {@code intn = 0;} declares no variable at all.
+   */
+  public void testEscapedSpaceBecomesBlank() {
+    PsiFile file = myFixture.addFileToProject("wurblets/Blank.wrbl", """
+        @{package org.tentackle.wurblet}@
+        @{import org.wurbelizer.wurblet.*}@
+        @{extends AbstractJavaWurblet}@
+        @[
+          private void wurbel() {
+            int\\ n = 0;
+        ]@
+          int\\ x = @(n)@;
+        @[
+          }
+        ]@
+        """);
+    myFixture.configureFromExistingVirtualFile(file.getVirtualFile());
+
+    PsiFile wurbletLevel = injectedFile(PsiTreeUtil.findChildOfType(file, WurbletBlock.class));
+    assertNotNull("no wurblet level injection", wurbletLevel);
+    assertIntVariable(wurbletLevel, "n");
+
+    PsiFile outputLevel = null;
+    for (WurbletOutputSegment segment : PsiTreeUtil.findChildrenOfType(file, WurbletOutputSegment.class)) {
+      outputLevel = injectedFile(segment);
+      if (outputLevel != null) {
+        break;
+      }
+    }
+    assertNotNull("no output level injection", outputLevel);
+    assertIntVariable(outputLevel, "x");
+  }
+
   /** A wurblet that does not extend AbstractJavaWurblet generates something else than Java. */
   public void testNonJavaWurbletHasNoOutputInjection() {
     PsiFile file = myFixture.addFileToProject("wurblets/Plain.wrbl", """
@@ -190,8 +229,21 @@ public class WurbletInjectionTest extends LightJavaCodeInsightFixtureTestCase {
   }
 
   private String injectedText(WurbletFile file, com.intellij.psi.PsiElement host) {
+    PsiFile injected = injectedFile(host);
+    return injected == null ? null : injected.getText();
+  }
+
+  private PsiFile injectedFile(com.intellij.psi.PsiElement host) {
     List<com.intellij.openapi.util.Pair<com.intellij.psi.PsiElement, com.intellij.openapi.util.TextRange>> files =
         InjectedLanguageManager.getInstance(getProject()).getInjectedPsiFiles(host);
-    return files == null || files.isEmpty() ? null : files.get(0).getFirst().getContainingFile().getText();
+    return files == null || files.isEmpty() ? null : files.get(0).getFirst().getContainingFile();
+  }
+
+  private void assertIntVariable(PsiFile injected, String name) {
+    PsiVariable variable = PsiTreeUtil.findChildrenOfType(injected, PsiVariable.class).stream()
+        .filter(v -> name.equals(v.getName()))
+        .findFirst().orElse(null);
+    assertNotNull("variable " + name + " not parsed:\n" + injected.getText(), variable);
+    assertEquals(PsiTypes.intType(), variable.getType());
   }
 }

@@ -123,7 +123,7 @@ of ours.
   those are real.
 - `@{code}@` and `@{comment}@` bodies are not injected as Java and javadoc.
 - A backslash directly followed by a blank cannot be expressed in generated output: the
-  wurbiler drops both characters and there is no escape for it.
+  wurbiler turns `\ ` into a lone blank and there is no escape for it.
 
 ## License
 

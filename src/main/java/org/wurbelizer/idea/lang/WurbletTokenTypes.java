@@ -68,7 +68,7 @@ public interface WurbletTokenTypes {
   /** The escape {@code \@}, standing for a literal {@code @}. */
   IElementType ESCAPED_AT = new WurbletElementType("ESCAPED_AT");
 
-  /** A backslash followed by a blank. The wurbiler drops both characters. */
+  /** A backslash followed by a blank. The wurbiler emits only the blank. */
   IElementType ESCAPED_SPACE = new WurbletElementType("ESCAPED_SPACE");
 
   /** A backslash followed by anything else. The wurbiler keeps both characters. */

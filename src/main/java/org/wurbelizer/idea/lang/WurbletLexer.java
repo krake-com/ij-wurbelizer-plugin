@@ -36,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
  *       {@code )@} and <code>}@</code> closes whatever level is currently open</li>
  *   <li>within a level, a further {@code @[}, {@code @(} or <code>@{</code> only increments a
  *       nesting counter and stays part of the enclosed text</li>
- *   <li>{@code \@} is a literal {@code @}, backslash-blank is dropped entirely, and a
+ *   <li>{@code \@} is a literal {@code @}, {@code \ } a literal blank, and a
  *       backslash before anything else keeps both characters (so {@code \\} stays
  *       {@code \\}); there is no line continuation in a {@code .wrbl} file</li>
  *   <li>an {@code @} that is not followed by <code>{</code>, {@code (} or {@code [} is an

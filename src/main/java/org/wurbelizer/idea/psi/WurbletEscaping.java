@@ -22,8 +22,8 @@ package org.wurbelizer.idea.psi;
  * Encoding and decoding of the wurblet escape sequences.
  * <p>
  * Mirrors the backslash handling of {@code org.wurbelizer.wurbile.AbstractWurbiler}:
- * {@code \@} stands for a literal {@code @}, a backslash followed by a blank is dropped
- * entirely and a backslash followed by anything else keeps both characters.
+ * {@code \@} stands for a literal {@code @}, {@code \ } for a blank, and a backslash
+ * followed by anything else keeps both characters.
  */
 public final class WurbletEscaping {
 
@@ -34,7 +34,7 @@ public final class WurbletEscaping {
    * Encodes text so that the wurbiler reproduces it verbatim.
    * <p>
    * Only the {@code @} needs escaping. A backslash directly followed by a blank cannot be
-   * expressed at all and is left alone.
+   * expressed at all (the wurbiler emits only the blank) and is left alone.
    *
    * @param text the text
    * @return the encoded text
@@ -57,8 +57,8 @@ public final class WurbletEscaping {
   /**
    * Decodes the escape sequences of a wurblet source text.
    * <p>
-   * This is what the wurbiler passes on: {@code \@} becomes {@code @} and a backslash
-   * followed by a blank disappears.
+   * This is what the wurbiler passes on: {@code \@} becomes {@code @} and {@code \ }
+   * becomes a blank.
    *
    * @param text the raw text
    * @return the decoded text
@@ -73,12 +73,8 @@ public final class WurbletEscaping {
       char c = text.charAt(i);
       if (c == '\\' && i + 1 < text.length()) {
         char n = text.charAt(i + 1);
-        if (n == '@') {
-          buf.append('@');
-          i += 2;
-          continue;
-        }
-        if (n == ' ') {
+        if (n == '@' || n == ' ') {
+          buf.append(n);
           i += 2;
           continue;
         }
