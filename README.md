@@ -122,8 +122,6 @@ of ours.
   errors are suppressed for that reason; the errors of the wurblet level are kept, because
   those are real.
 - `@{code}@` and `@{comment}@` bodies are not injected as Java and javadoc.
-- A backslash directly followed by a blank cannot be expressed in generated output: the
-  wurbiler turns `\ ` into a lone blank and there is no escape for it.
 
 ## License
 
