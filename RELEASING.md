@@ -58,7 +58,7 @@ installed on this machine.
    ./gradlew -PplatformLocalPath= signPlugin
    ```
    The signed artifact lands in `build/distributions/`.
-5. Commit and tag (`v<version>`), then push.
+5. Commit and tag (`<version>`), then push.
 6. Publish — **first release only**: upload the signed zip by hand at
    <https://plugins.jetbrains.com> (Profile -> Add new plugin). Later releases:
    ```bash
@@ -73,7 +73,7 @@ days; if nothing arrives, mail <marketplace@jetbrains.com>.
 
 - **License**: LGPL 2.1 (a license must be selected; it is a mandatory field)
 - **Tags**: at least one is required
-- **Source code**: <https://bitbucket.org/krake-oss/ij-wurbelizer-plugin> — the
+- **Source code**: <https://github.com/krake-com/ij-wurbelizer-plugin> — the
   repository has to be public, since the Marketplace requires open-source plugins to
   link to their source
 - **Documentation**: <https://wurbelizer.org>

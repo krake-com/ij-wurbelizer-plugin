@@ -5,8 +5,6 @@ All notable changes to the Wurbelizer plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
 ## [1.0.1]
 
 ### Fixed
@@ -34,6 +32,5 @@ First public release.
 - Per-project settings under *Settings | Languages & Frameworks | Wurblet*.
 - Colour scheme contributions for the Default and Darcula schemes.
 
-[Unreleased]: https://bitbucket.org/krake-oss/ij-wurbelizer-plugin/branches/compare/HEAD..v1.0.1
-[1.0.1]: https://bitbucket.org/krake-oss/ij-wurbelizer-plugin/branches/compare/v1.0.1..v1.0.0
-[1.0.0]: https://bitbucket.org/krake-oss/ij-wurbelizer-plugin/src/v1.0.0/
+[1.0.1]: https://github.com/krake-com/ij-wurbelizer-plugin/compare/1.0.0...1.0.1
+[1.0.0]: https://github.com/krake-com/ij-wurbelizer-plugin/tree/1.0.0
